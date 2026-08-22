@@ -5,16 +5,18 @@ namespace App\Http\Controllers;
 use App\Models\ActualizacionPrecio;
 use App\Models\Categoria;
 use App\Models\Gasto;
+use App\Models\Proveedor;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-         $categorias = Categoria::with('productos')
+         $categorias = Categoria::with('productos.productoProveedores.proveedor')
             ->orderByRaw("nombre = 'Sin categoría' ASC")
             ->orderBy('nombre')
-            ->paginate(10, ['*'], 'insumos_page')
-            ->withQueryString();
+            ->get();
+
+        $proveedores = Proveedor::orderBy('nombre')->get();
 
         $gastos = Gasto::with('producto')
             ->latest()
@@ -28,6 +30,7 @@ class DashboardController extends Controller
 
         return view('dashboard', [
             'categorias' => $categorias,
+            'proveedores' => $proveedores,
             'gastos' => $gastos,
             'actualizaciones' => $actualizaciones,
         ]);

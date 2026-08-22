@@ -18,22 +18,53 @@
             background-color: rgba(255, 255, 255, 0.2);
             color: #fff;
         }
+        .proveedor-filtro-item-activo {
+            background-color: rgb(79 70 229);
+            color: #fff;
+        }
+        .proveedor-filtro-item-activo:hover {
+            background-color: rgb(79 70 229);
+            color: #fff;
+        }
     </style>
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
 
     <header class="sticky top-0 z-20 border-b-2 border-indigo-500/60 bg-white/95 backdrop-blur dark:border-indigo-500/30 dark:bg-slate-950/95">
-        <div class="mx-auto max-w-6xl px-4 py-2.5">
+        <div class="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-2.5">
             <div class="flex items-baseline gap-2">
                 <h1 class="text-base font-bold tracking-tight text-indigo-600 dark:text-indigo-400">
                     Almacén Viejos
                 </h1>
                 <p class="text-xs text-slate-500 dark:text-slate-400">Lista de precios</p>
             </div>
+
+            <button
+                type="button"
+                id="btn-nueva-categoria"
+                class="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-indigo-600 px-3 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700"
+            >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Nueva categoría
+            </button>
         </div>
     </header>
 
     <main class="mx-auto max-w-6xl space-y-8 px-4 py-6">
+
+        @if (session('success'))
+            <div class="mx-auto w-full max-w-2xl rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-medium text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-400">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="mx-auto w-full max-w-2xl rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-medium text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-400">
+                {{ session('error') }}
+            </div>
+        @endif
 
         {{-- Buscador + filtro de categoría --}}
         <div class="mx-auto w-full max-w-2xl">
@@ -83,14 +114,52 @@
                         @endforeach
                     </div>
                 </div>
+
+                <div class="relative shrink-0">
+                    <button
+                        type="button"
+                        id="btn-filtro-proveedor"
+                        aria-expanded="false"
+                        aria-controls="panel-filtro-proveedor"
+                        class="relative flex h-full items-center justify-center rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-slate-600 shadow-sm transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-indigo-500/40 dark:hover:bg-slate-800 dark:hover:text-indigo-300"
+                    >
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 7h11v8H3zM14 10h4l3 3v2h-7zM6 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM17 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path>
+                        </svg>
+                        <span id="btn-filtro-proveedor-dot" class="absolute -right-1 -top-1 hidden h-2.5 w-2.5 rounded-full bg-indigo-500"></span>
+                    </button>
+
+                    <div id="backdrop-filtro-proveedor" class="fixed inset-0 z-30 hidden"></div>
+
+                    <div id="panel-filtro-proveedor" class="absolute right-0 z-40 mt-2 hidden max-h-80 w-56 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg dark:border-slate-800 dark:bg-slate-900">
+                        <button type="button" class="proveedor-filtro-item flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-600 transition-colors hover:bg-indigo-50 hover:text-indigo-700 dark:text-slate-300 dark:hover:bg-indigo-500/10 dark:hover:text-indigo-300" data-proveedor-id="" data-nombre="Todos los proveedores">
+                            <span class="truncate">Todos los proveedores</span>
+                        </button>
+                        @foreach ($proveedores as $proveedor)
+                            <button type="button" class="proveedor-filtro-item flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-600 transition-colors hover:bg-indigo-50 hover:text-indigo-700 dark:text-slate-300 dark:hover:bg-indigo-500/10 dark:hover:text-indigo-300" data-proveedor-id="{{ $proveedor->id }}" data-nombre="{{ $proveedor->nombre }}">
+                                <span class="truncate">{{ $proveedor->nombre }}</span>
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
             </div>
 
-            {{-- Chip de categoría activa --}}
-            <div id="filtro-activo" class="mt-2 hidden items-center gap-2 text-sm">
-                <span class="text-slate-500 dark:text-slate-400">Categoría:</span>
-                <span class="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 py-1 pl-2.5 pr-1.5 text-xs font-medium text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400">
+            {{-- Chips de filtros activos --}}
+            <div class="mt-2 flex flex-wrap items-center gap-2 text-sm">
+                <span id="filtro-activo" class="hidden items-center gap-1.5 rounded-full bg-indigo-50 py-1 pl-2.5 pr-1.5 text-xs font-medium text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400">
+                    <span class="text-indigo-400 dark:text-indigo-500">Categoría:</span>
                     <span id="filtro-activo-nombre"></span>
                     <button type="button" id="quitar-filtro-categoria" class="rounded-full p-0.5 text-indigo-500 hover:bg-indigo-100 hover:text-indigo-800 dark:text-indigo-300 dark:hover:bg-indigo-500/20 dark:hover:text-indigo-100" aria-label="Quitar filtro de categoría">
+                        <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"></path>
+                        </svg>
+                    </button>
+                </span>
+
+                <span id="filtro-activo-proveedor" class="hidden items-center gap-1.5 rounded-full bg-indigo-50 py-1 pl-2.5 pr-1.5 text-xs font-medium text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400">
+                    <span class="text-indigo-400 dark:text-indigo-500">Proveedor:</span>
+                    <span id="filtro-activo-proveedor-nombre"></span>
+                    <button type="button" id="quitar-filtro-proveedor" class="rounded-full p-0.5 text-indigo-500 hover:bg-indigo-100 hover:text-indigo-800 dark:text-indigo-300 dark:hover:bg-indigo-500/20 dark:hover:text-indigo-100" aria-label="Quitar filtro de proveedor">
                         <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"></path>
                         </svg>
@@ -105,20 +174,41 @@
                 <section class="categoria-card" data-categoria-id="{{ $categoria->id }}" data-vacia="{{ $categoria->productos->count() === 0 ? '1' : '0' }}">
                     <div class="mb-3 flex items-center justify-between gap-2 border-b border-slate-200 pb-1.5 dark:border-slate-800">
                         <h2 class="text-sm font-bold uppercase tracking-wide text-indigo-600 dark:text-indigo-400">{{ $categoria->nombre }}</h2>
-                        <span class="shrink-0 rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400">
-                            {{ $categoria->productos->count() }}
-                        </span>
+                        <div class="flex shrink-0 items-center gap-1.5">
+                            <span class="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400">
+                                {{ $categoria->productos->count() }}
+                            </span>
+                            <form method="POST" action="{{ route('categorias.delete', $categoria->id) }}" class="form-borrar-categoria">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="rounded-full p-1 text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:text-slate-500 dark:hover:bg-rose-500/10 dark:hover:text-rose-400" aria-label="Borrar categoría {{ $categoria->nombre }}">
+                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m-7 0v12a1 1 0 001 1h6a1 1 0 001-1V7"></path>
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
                     </div>
 
                     @if ($categoria->productos->count() > 0)
-                        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
+                        <div class="grid grid-cols-3 gap-2.5 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
                             @foreach ($categoria->productos as $producto)
-                                <div class="producto-row group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-slate-800 dark:bg-slate-900" data-nombre="{{ Str::lower($producto->nombre) }}">
-                                    <div class="flex aspect-square items-center justify-center bg-slate-100 text-slate-300 dark:bg-slate-800 dark:text-slate-600">
+                                <div class="producto-row group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-slate-800 dark:bg-slate-900" data-nombre="{{ Str::lower($producto->nombre) }}" data-proveedores="{{ $producto->productoProveedores->pluck('proveedor_id')->implode(',') }}">
+                                    <div class="relative flex aspect-square items-center justify-center bg-slate-100 text-slate-300 dark:bg-slate-800 dark:text-slate-600">
+                                        <form method="POST" action="{{ route('productos.delete', $producto->id) }}" class="form-borrar-producto absolute right-1 top-1 z-10">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="rounded-full bg-rose-600 p-1 text-white shadow-sm hover:bg-rose-700" aria-label="Borrar producto {{ $producto->nombre }}">
+                                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m-7 0v12a1 1 0 001 1h6a1 1 0 001-1V7"></path>
+                                                </svg>
+                                            </button>
+                                        </form>
+
                                         @if ($producto->foto)
                                             <img src="{{ Storage::url($producto->foto) }}" alt="{{ $producto->nombre }}" class="h-full w-full object-cover">
                                         @else
-                                            <svg class="h-10 w-10" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <svg class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                 <rect x="3" y="3" width="18" height="18" rx="2"></rect>
                                                 <circle cx="8.5" cy="8.5" r="1.5"></circle>
                                                 <path d="M21 15l-5-5L5 21"></path>
@@ -127,6 +217,13 @@
                                     </div>
                                     <div class="flex flex-1 flex-col gap-1.5 p-3">
                                         <p class="producto-nombre line-clamp-2 text-sm font-medium leading-snug text-slate-800 dark:text-slate-100">{{ $producto->nombre }}</p>
+
+                                        @if ($producto->productoProveedores->count())
+                                            <p class="truncate text-[11px] text-slate-500 dark:text-slate-400">
+                                                {{ $producto->productoProveedores->pluck('proveedor.nombre')->implode(', ') }}
+                                            </p>
+                                        @endif
+
                                         <p class="mt-auto text-lg font-extrabold text-emerald-600 dark:text-emerald-400">
                                             ${{ number_format($producto->precio_venta_calculado ?? 0, 2) }}
                                         </p>
@@ -149,11 +246,50 @@
             No se encontraron productos que coincidan con la búsqueda.
         </p>
 
-        <div>
-            {{ $categorias->links() }}
-        </div>
-
     </main>
+
+    {{-- Modal: nueva categoría --}}
+    <div id="modal-nueva-categoria" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+        <div id="modal-nueva-categoria-backdrop" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
+
+        <div class="relative w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900">
+            <div class="mb-4 flex items-center justify-between">
+                <h2 class="text-sm font-bold text-slate-800 dark:text-slate-100">Nueva categoría</h2>
+                <button type="button" id="btn-cerrar-modal-categoria" class="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300" aria-label="Cerrar">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <form method="POST" action="{{ route('categorias.store') }}" class="space-y-3">
+                @csrf
+                <div>
+                    <label for="nombre" class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Nombre</label>
+                    <input
+                        type="text"
+                        name="nombre"
+                        id="nombre"
+                        value="{{ old('nombre') }}"
+                        autocomplete="off"
+                        class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                    >
+                    @error('nombre')
+                        <p class="mt-1 text-xs font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" id="btn-cancelar-categoria" class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700">
+                        Crear
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script>
         (function () {
@@ -170,7 +306,17 @@
             const filtroActivoNombre = document.getElementById('filtro-activo-nombre');
             const quitarFiltroCategoria = document.getElementById('quitar-filtro-categoria');
 
+            const btnFiltroProveedor = document.getElementById('btn-filtro-proveedor');
+            const btnFiltroProveedorDot = document.getElementById('btn-filtro-proveedor-dot');
+            const panelFiltroProveedor = document.getElementById('panel-filtro-proveedor');
+            const backdropFiltroProveedor = document.getElementById('backdrop-filtro-proveedor');
+            const proveedorItems = Array.from(document.querySelectorAll('.proveedor-filtro-item'));
+            const filtroActivoProveedor = document.getElementById('filtro-activo-proveedor');
+            const filtroActivoProveedorNombre = document.getElementById('filtro-activo-proveedor-nombre');
+            const quitarFiltroProveedor = document.getElementById('quitar-filtro-proveedor');
+
             let categoriaSeleccionada = '';
+            let proveedorSeleccionado = '';
 
             function escapeHtml(str) {
                 return str.replace(/[&<>"']/g, function (c) {
@@ -216,7 +362,10 @@
                     let categoriaTieneMatch = false;
 
                     filas.forEach(function (fila) {
-                        const coincide = !query || fila.dataset.nombre.includes(query);
+                        const coincideTexto = !query || fila.dataset.nombre.includes(query);
+                        const proveedoresFila = (fila.dataset.proveedores || '').split(',').filter(Boolean);
+                        const coincideProveedor = !proveedorSeleccionado || proveedoresFila.includes(proveedorSeleccionado);
+                        const coincide = coincideTexto && coincideProveedor;
                         fila.classList.toggle('hidden', !coincide);
                         if (coincide) categoriaTieneMatch = true;
 
@@ -225,8 +374,9 @@
                     });
 
                     // Una categoría vacía de origen siempre se muestra. Una categoría con productos que se
-                    // queda sin ningún match tras el filtro de texto se oculta.
-                    const visible = esVacia || !query || categoriaTieneMatch;
+                    // queda sin ningún match tras los filtros activos (texto y/o proveedor) se oculta.
+                    const hayFiltrosActivos = !!query || !!proveedorSeleccionado;
+                    const visible = esVacia || !hayFiltrosActivos || categoriaTieneMatch;
                     categoria.classList.toggle('hidden', !visible);
                     if (visible) algunaVisible = true;
                 });
@@ -266,6 +416,7 @@
             }
 
             function abrirPanelFiltro() {
+                cerrarPanelFiltroProveedor();
                 panelFiltro.classList.remove('hidden');
                 backdropFiltro.classList.remove('hidden');
                 btnFiltro.setAttribute('aria-expanded', 'true');
@@ -328,9 +479,122 @@
                 seleccionarCategoria('', '');
             });
 
+            // Filtro por proveedor (misma mecánica que el de categoría)
+            function abrirPanelFiltroProveedor() {
+                cerrarPanelFiltro();
+                panelFiltroProveedor.classList.remove('hidden');
+                backdropFiltroProveedor.classList.remove('hidden');
+                btnFiltroProveedor.setAttribute('aria-expanded', 'true');
+            }
+
+            function cerrarPanelFiltroProveedor() {
+                panelFiltroProveedor.classList.add('hidden');
+                backdropFiltroProveedor.classList.add('hidden');
+                btnFiltroProveedor.setAttribute('aria-expanded', 'false');
+            }
+
+            function actualizarProveedorActivo() {
+                proveedorItems.forEach(function (item) {
+                    const activo = (item.dataset.proveedorId || '') === proveedorSeleccionado;
+                    item.classList.toggle('proveedor-filtro-item-activo', activo);
+                });
+            }
+
+            function seleccionarProveedor(id, nombre) {
+                proveedorSeleccionado = id || '';
+                actualizarProveedorActivo();
+
+                if (proveedorSeleccionado) {
+                    filtroActivoProveedorNombre.textContent = nombre;
+                    filtroActivoProveedor.classList.remove('hidden');
+                    filtroActivoProveedor.classList.add('flex');
+                    btnFiltroProveedorDot.classList.remove('hidden');
+                } else {
+                    filtroActivoProveedor.classList.add('hidden');
+                    filtroActivoProveedor.classList.remove('flex');
+                    btnFiltroProveedorDot.classList.add('hidden');
+                }
+
+                cerrarPanelFiltroProveedor();
+                aplicarFiltros();
+            }
+
+            btnFiltroProveedor.addEventListener('click', function () {
+                const abierto = btnFiltroProveedor.getAttribute('aria-expanded') === 'true';
+                if (abierto) {
+                    cerrarPanelFiltroProveedor();
+                } else {
+                    abrirPanelFiltroProveedor();
+                }
+            });
+
+            backdropFiltroProveedor.addEventListener('click', cerrarPanelFiltroProveedor);
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') cerrarPanelFiltroProveedor();
+            });
+
+            proveedorItems.forEach(function (item) {
+                item.addEventListener('click', function () {
+                    seleccionarProveedor(item.dataset.proveedorId, item.dataset.nombre);
+                });
+            });
+
+            quitarFiltroProveedor.addEventListener('click', function () {
+                seleccionarProveedor('', '');
+            });
+
             buscador.addEventListener('input', function () {
                 aplicarFiltros();
                 scrollAlPrimerResultado();
+            });
+
+            // Modal: nueva categoría
+            const btnNuevaCategoria = document.getElementById('btn-nueva-categoria');
+            const modalCategoria = document.getElementById('modal-nueva-categoria');
+            const modalCategoriaBackdrop = document.getElementById('modal-nueva-categoria-backdrop');
+            const btnCerrarModalCategoria = document.getElementById('btn-cerrar-modal-categoria');
+            const btnCancelarCategoria = document.getElementById('btn-cancelar-categoria');
+            const inputNombreCategoria = document.getElementById('nombre');
+
+            function abrirModalCategoria() {
+                modalCategoria.classList.remove('hidden');
+                modalCategoria.classList.add('flex');
+                inputNombreCategoria.focus();
+            }
+
+            function cerrarModalCategoria() {
+                modalCategoria.classList.add('hidden');
+                modalCategoria.classList.remove('flex');
+            }
+
+            btnNuevaCategoria.addEventListener('click', abrirModalCategoria);
+            modalCategoriaBackdrop.addEventListener('click', cerrarModalCategoria);
+            btnCerrarModalCategoria.addEventListener('click', cerrarModalCategoria);
+            btnCancelarCategoria.addEventListener('click', cerrarModalCategoria);
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') cerrarModalCategoria();
+            });
+
+            @if ($errors->has('nombre'))
+                abrirModalCategoria();
+            @endif
+
+            document.querySelectorAll('.form-borrar-categoria').forEach(function (form) {
+                form.addEventListener('submit', function (e) {
+                    if (!confirm('¿Borrar esta categoría? Esta acción no se puede deshacer.')) {
+                        e.preventDefault();
+                    }
+                });
+            });
+
+            document.querySelectorAll('.form-borrar-producto').forEach(function (form) {
+                form.addEventListener('submit', function (e) {
+                    if (!confirm('¿Borrar este producto? Esta acción no se puede deshacer.')) {
+                        e.preventDefault();
+                    }
+                });
             });
         })();
     </script>

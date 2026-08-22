@@ -10,6 +10,7 @@ class ActualizacionPrecio extends Model
 
     protected $fillable = [
         'producto_id',
+        'proveedor_id',
         'precio_anterior',
         'precio_nuevo',
         'telegram_user_id',
@@ -18,5 +19,10 @@ class ActualizacionPrecio extends Model
     public function producto()
     {
         return $this->belongsTo(Producto::class);
+    }
+
+    public function proveedor()
+    {
+        return $this->belongsTo(Proveedor::class);
     }
 }

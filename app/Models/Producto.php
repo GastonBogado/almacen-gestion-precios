@@ -32,4 +32,13 @@ class Producto extends Model
     {
         return $this->hasMany(Gasto::class);
     }
+    public function productoProveedores()
+    {
+    return $this->hasMany(ProductoProveedor::class);
+    }
+
+    public function ofertas()
+    {
+    return $this->hasMany(Oferta::class);
+    }
 }
