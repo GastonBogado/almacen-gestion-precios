@@ -39,16 +39,54 @@
                 <p class="text-xs text-slate-500 dark:text-slate-400">Lista de precios</p>
             </div>
 
-            <button
-                type="button"
-                id="btn-nueva-categoria"
-                class="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-indigo-600 px-3 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700"
-            >
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-                Nueva categoría
-            </button>
+            <div class="flex shrink-0 items-center gap-2">
+               @can('admin') <button
+                    type="button"
+                    id="btn-nueva-categoria"
+                    class="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-indigo-600 px-3 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700"
+                >
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Nueva categoría
+                </button>
+
+                <button
+                    type="button"
+                    id="btn-nuevo-producto"
+                    class="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-indigo-600 px-3 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700"
+                >
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Nuevo producto
+                </button>
+
+                <button
+                    type="button"
+                    id="btn-nuevo-proveedor"
+                    class="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-indigo-600 px-3 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700"
+                >
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Nuevo proveedor
+                </button>
+            @endcan
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button
+                        type="submit"
+                        class="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-600 shadow-sm transition-colors hover:border-rose-300 hover:bg-rose-50 hover:text-rose-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-rose-500/40 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
+                        aria-label="Cerrar sesión"
+                    >
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m0-8H5a2 2 0 00-2 2v12a2 2 0 002 2h2"></path>
+                        </svg>
+                        Salir
+                    </button>
+                </form>
+            </div>
         </div>
     </header>
 
@@ -178,6 +216,7 @@
                             <span class="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400">
                                 {{ $categoria->productos->count() }}
                             </span>
+                            @can('admin')
                             <form method="POST" action="{{ route('categorias.delete', $categoria->id) }}" class="form-borrar-categoria">
                                 @csrf
                                 @method('DELETE')
@@ -187,24 +226,33 @@
                                     </svg>
                                 </button>
                             </form>
+                            @endcan
                         </div>
                     </div>
-
                     @if ($categoria->productos->count() > 0)
                         <div class="grid grid-cols-3 gap-2.5 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
                             @foreach ($categoria->productos as $producto)
                                 <div class="producto-row group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-slate-800 dark:bg-slate-900" data-nombre="{{ Str::lower($producto->nombre) }}" data-proveedores="{{ $producto->productoProveedores->pluck('proveedor_id')->implode(',') }}">
                                     <div class="relative flex aspect-square items-center justify-center bg-slate-100 text-slate-300 dark:bg-slate-800 dark:text-slate-600">
-                                        <form method="POST" action="{{ route('productos.delete', $producto->id) }}" class="form-borrar-producto absolute right-1 top-1 z-10">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="rounded-full bg-rose-600 p-1 text-white shadow-sm hover:bg-rose-700" aria-label="Borrar producto {{ $producto->nombre }}">
+                                      @can('admin')
+                                        <div class="absolute right-1 top-1 z-10 flex items-center gap-1">
+                                            <a href="{{ route('productos.edit', $producto->id) }}" class="rounded-full bg-indigo-600 p-1 text-white shadow-sm hover:bg-indigo-700" aria-label="Editar producto {{ $producto->nombre }}">
                                                 <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m-7 0v12a1 1 0 001 1h6a1 1 0 001-1V7"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 4h4.5M4 20l4.5-1L18.5 8.5a1.5 1.5 0 000-2.121L17.121 5A1.5 1.5 0 0015 5L5 15l-1 5z"></path>
                                                 </svg>
-                                            </button>
-                                        </form>
+                                            </a>
 
+                                            <form method="POST" action="{{ route('productos.delete', $producto->id) }}" class="form-borrar-producto">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="rounded-full bg-rose-600 p-1 text-white shadow-sm hover:bg-rose-700" aria-label="Borrar producto {{ $producto->nombre }}">
+                                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m-7 0v12a1 1 0 001 1h6a1 1 0 001-1V7"></path>
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        </div>
+                                        @endcan
                                         @if ($producto->foto)
                                             <img src="{{ Storage::url($producto->foto) }}" alt="{{ $producto->nombre }}" class="h-full w-full object-cover">
                                         @else
@@ -264,23 +312,209 @@
 
             <form method="POST" action="{{ route('categorias.store') }}" class="space-y-3">
                 @csrf
+                <input type="hidden" name="_form" value="categoria">
                 <div>
                     <label for="nombre" class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Nombre</label>
                     <input
                         type="text"
                         name="nombre"
                         id="nombre"
-                        value="{{ old('nombre') }}"
+                        value="{{ old('_form') === 'categoria' ? old('nombre') : '' }}"
                         autocomplete="off"
                         class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                     >
                     @error('nombre')
-                        <p class="mt-1 text-xs font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>
+                        @if (old('_form') === 'categoria')
+                            <p class="mt-1 text-xs font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>
+                        @endif
                     @enderror
                 </div>
 
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" id="btn-cancelar-categoria" class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700">
+                        Crear
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- Modal: nuevo producto --}}
+    <div id="modal-nuevo-producto" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+        <div id="modal-nuevo-producto-backdrop" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
+
+        <div class="relative w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900">
+            <div class="mb-4 flex items-center justify-between">
+                <h2 class="text-sm font-bold text-slate-800 dark:text-slate-100">Nuevo producto</h2>
+                <button type="button" id="btn-cerrar-modal-producto" class="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300" aria-label="Cerrar">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <form method="POST" action="{{ route('productos.store') }}" class="max-h-[75vh] space-y-3 overflow-y-auto pr-1">
+                @csrf
+                <input type="hidden" name="_form" value="producto">
+
+                <div>
+                    <label for="producto_nombre" class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Nombre</label>
+                    <input
+                        type="text"
+                        name="nombre"
+                        id="producto_nombre"
+                        value="{{ old('_form') === 'producto' ? old('nombre') : '' }}"
+                        autocomplete="off"
+                        required
+                        class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                    >
+                    @error('nombre')
+                        @if (old('_form') === 'producto')
+                            <p class="mt-1 text-xs font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>
+                        @endif
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="producto_unidad" class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Unidad</label>
+                    <input
+                        type="text"
+                        name="unidad"
+                        id="producto_unidad"
+                        value="{{ old('unidad') }}"
+                        autocomplete="off"
+                        placeholder="kg, unidad, litro..."
+                        required
+                        class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                    >
+                    @error('unidad')
+                        <p class="mt-1 text-xs font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="producto_categoria_id" class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Categoría</label>
+                    <select
+                        name="categoria_id"
+                        id="producto_categoria_id"
+                        class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                    >
+                        <option value="">Sin categoría</option>
+                        @foreach ($categorias as $categoria)
+                            <option value="{{ $categoria->id }}" @selected(old('categoria_id') == $categoria->id)>
+                                {{ $categoria->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('categoria_id')
+                        <p class="mt-1 text-xs font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="producto_margen_pct" class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Margen (%)</label>
+                    <input
+                        type="number"
+                        name="margen_pct"
+                        id="producto_margen_pct"
+                        value="{{ old('margen_pct', 40) }}"
+                        step="0.01"
+                        required
+                        class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                    >
+                    @error('margen_pct')
+                        <p class="mt-1 text-xs font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="producto_proveedor_id" class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Proveedor</label>
+                    <select
+                        name="proveedor_id"
+                        id="producto_proveedor_id"
+                        required
+                        class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                    >
+                        @foreach ($proveedores as $proveedor)
+                            <option value="{{ $proveedor->id }}" @selected(old('proveedor_id') == $proveedor->id)>
+                                {{ $proveedor->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('proveedor_id')
+                        <p class="mt-1 text-xs font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="producto_precio" class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Precio de este proveedor</label>
+                    <input
+                        type="number"
+                        name="precio"
+                        id="producto_precio"
+                        value="{{ old('precio') }}"
+                        step="0.01"
+                        min="0.01"
+                        required
+                        class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                    >
+                    @error('precio')
+                        <p class="mt-1 text-xs font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" id="btn-cancelar-producto" class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700">
+                        Crear producto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- Modal: nuevo proveedor --}}
+    <div id="modal-nuevo-proveedor" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+        <div id="modal-nuevo-proveedor-backdrop" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
+
+        <div class="relative w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900">
+            <div class="mb-4 flex items-center justify-between">
+                <h2 class="text-sm font-bold text-slate-800 dark:text-slate-100">Nuevo proveedor</h2>
+                <button type="button" id="btn-cerrar-modal-proveedor" class="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300" aria-label="Cerrar">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <form method="POST" action="{{ route('proveedores.store') }}" class="space-y-3">
+                @csrf
+                <input type="hidden" name="_form" value="proveedor">
+                <div>
+                    <label for="proveedor_nombre" class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">Nombre</label>
+                    <input
+                        type="text"
+                        name="nombre"
+                        id="proveedor_nombre"
+                        value="{{ old('_form') === 'proveedor' ? old('nombre') : '' }}"
+                        autocomplete="off"
+                        required
+                        class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                    >
+                    @error('nombre')
+                        @if (old('_form') === 'proveedor')
+                            <p class="mt-1 text-xs font-medium text-rose-600 dark:text-rose-400">{{ $message }}</p>
+                        @endif
+                    @enderror
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" id="btn-cancelar-proveedor" class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
                         Cancelar
                     </button>
                     <button type="submit" class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700">
@@ -577,8 +811,68 @@
                 if (e.key === 'Escape') cerrarModalCategoria();
             });
 
-            @if ($errors->has('nombre'))
+            // Modal: nuevo producto
+            const btnNuevoProducto = document.getElementById('btn-nuevo-producto');
+            const modalProducto = document.getElementById('modal-nuevo-producto');
+            const modalProductoBackdrop = document.getElementById('modal-nuevo-producto-backdrop');
+            const btnCerrarModalProducto = document.getElementById('btn-cerrar-modal-producto');
+            const btnCancelarProducto = document.getElementById('btn-cancelar-producto');
+            const inputNombreProducto = document.getElementById('producto_nombre');
+
+            function abrirModalProducto() {
+                modalProducto.classList.remove('hidden');
+                modalProducto.classList.add('flex');
+                inputNombreProducto.focus();
+            }
+
+            function cerrarModalProducto() {
+                modalProducto.classList.add('hidden');
+                modalProducto.classList.remove('flex');
+            }
+
+            btnNuevoProducto.addEventListener('click', abrirModalProducto);
+            modalProductoBackdrop.addEventListener('click', cerrarModalProducto);
+            btnCerrarModalProducto.addEventListener('click', cerrarModalProducto);
+            btnCancelarProducto.addEventListener('click', cerrarModalProducto);
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') cerrarModalProducto();
+            });
+
+            // Modal: nuevo proveedor
+            const btnNuevoProveedor = document.getElementById('btn-nuevo-proveedor');
+            const modalProveedor = document.getElementById('modal-nuevo-proveedor');
+            const modalProveedorBackdrop = document.getElementById('modal-nuevo-proveedor-backdrop');
+            const btnCerrarModalProveedor = document.getElementById('btn-cerrar-modal-proveedor');
+            const btnCancelarProveedor = document.getElementById('btn-cancelar-proveedor');
+            const inputNombreProveedor = document.getElementById('proveedor_nombre');
+
+            function abrirModalProveedor() {
+                modalProveedor.classList.remove('hidden');
+                modalProveedor.classList.add('flex');
+                inputNombreProveedor.focus();
+            }
+
+            function cerrarModalProveedor() {
+                modalProveedor.classList.add('hidden');
+                modalProveedor.classList.remove('flex');
+            }
+
+            btnNuevoProveedor.addEventListener('click', abrirModalProveedor);
+            modalProveedorBackdrop.addEventListener('click', cerrarModalProveedor);
+            btnCerrarModalProveedor.addEventListener('click', cerrarModalProveedor);
+            btnCancelarProveedor.addEventListener('click', cerrarModalProveedor);
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') cerrarModalProveedor();
+            });
+
+            @if (old('_form') === 'categoria' && $errors->any())
                 abrirModalCategoria();
+            @elseif (old('_form') === 'producto' && $errors->any())
+                abrirModalProducto();
+            @elseif (old('_form') === 'proveedor' && $errors->any())
+                abrirModalProveedor();
             @endif
 
             document.querySelectorAll('.form-borrar-categoria').forEach(function (form) {
